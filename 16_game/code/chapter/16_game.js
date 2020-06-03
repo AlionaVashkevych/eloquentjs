@@ -361,7 +361,8 @@ async function runGame(plans, Display) {
       lives--;
         if (lives == 0){
           console.log(`lives: ${lives}, You've lost!`);
-         
+         status = "lost";
+         return;
           }
     } 
   }
