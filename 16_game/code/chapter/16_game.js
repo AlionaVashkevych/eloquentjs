@@ -112,11 +112,48 @@ var Coin = class Coin {
 
 Coin.prototype.size = new Vec(0.6, 0.6);
 
+/*___________________ 16.3 A monster___________________ */
+const monsterSpeed = 4;
+
+class Monster {
+  constructor(pos) {    this.pos = pos;  }
+
+  get type() { return "monster"; }
+
+  static create(pos) {
+    return new Monster(pos.plus(new Vec(0, -1)));
+  }
+
+  update(time, state) {
+    let player = state.player;
+        let speed = (player.pos.x < this.pos.x ? -1 : 1) * time * monsterSpeed;
+        let newPos = new Vec(this.pos.x + speed, this.pos.y);
+        if (state.level.touches(newPos, this.size, "wall")) return this;
+        else return new Monster(newPos);
+  }
+
+  collide(state) {
+    let player = state.player;
+    if (player.pos.y + player.size.y < this.pos.y + 0.5) {
+      let filtered = state.actors.filter(a => a != this);
+      return new State(state.level, filtered, state.status);
+    } else {
+      return new State(state.level, state.actors, "lost");
+    }
+  }
+}
+
+Monster.prototype.size = new Vec(1.2, 2);
+
+/*_______________________________________________________ */
+
 var levelChars = {
   ".": "empty", "#": "wall", "+": "lava",
   "@": Player, "o": Coin,
   "=": Lava, "|": Lava, "v": Lava
 };
+
+levelChars["M"] = Monster;
 
 var simpleLevel = new Level(simpleLevelPlan);
 
@@ -369,6 +406,9 @@ async function runGame(plans, Display) {
   console.log("You've won!");
 }
 */
+
+
+/*___________________ 16.1 Game Over___________________ */
 async function runGame(plans, Display) {
   let lives = 3;
   for (let level = 0; level < plans.length && lives > 0;) {
@@ -384,3 +424,5 @@ async function runGame(plans, Display) {
     console.log("Game over");
   }
 }
+
+/*_______________________________________________________ */
